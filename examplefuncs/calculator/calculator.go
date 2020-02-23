@@ -14,7 +14,7 @@ func Run(port int) {
 	dr := &CalculatorRouter{}
 
 	mux := coap.NewServeMux()
-	mux.Handle("*", dr)
+	mux.Handle("", dr)
 
 	fmt.Printf("handling calculator requests on %d\n", port)
 	log.Fatal(coap.ListenAndServe("udp", fmt.Sprintf(":%d", port), mux))
@@ -25,7 +25,7 @@ type CalculatorRouter struct {
 }
 
 func (r *CalculatorRouter) ServeCOAP(w coap.ResponseWriter, req *coap.Request) {
-	log.Printf("Got message: %#v path=%q: from %v\n", req.Msg.PathString(), req.Msg, req.Client.RemoteAddr())
+	log.Printf("Got message: from %v\n", req.Client.RemoteAddr())
 
 	w.SetContentFormat(coap.AppJSON)
 

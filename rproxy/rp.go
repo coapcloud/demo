@@ -2,6 +2,7 @@ package rproxy
 
 import (
 	"fmt"
+	"log"
 	"net"
 )
 
@@ -15,7 +16,7 @@ type Backend struct {
 }
 
 var backends = map[string]string{
-	"calculator": "127.0.0.1:9101",
+	"calculator": ":9101",
 	// "127.0.0.1:9102",
 }
 
@@ -42,7 +43,7 @@ func InitRouteTable() RouteTable {
 }
 
 func Start(port int) {
-	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("127.0.0.1:%d", port))
+	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		panic(err)
 	}
@@ -56,6 +57,7 @@ func Start(port int) {
 
 	buffer := make([]byte, 64)
 	for {
+		fmt.Println("reading from udp conn")
 		n, raddr, err := c.ReadFrom(buffer)
 		if err != nil {
 			panic(err)
@@ -65,33 +67,29 @@ func Start(port int) {
 
 		fmt.Println("forwarding to handler")
 
-		pConn, err := net.DialUDP("udp", addr, rt.table["calculator"].addr)
+		destConn, err := net.DialUDP("udp", nil, rt.table["calculator"].addr)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
-		_, err = pConn.Write(buffer[0:n])
+		_, err = destConn.Write(buffer[0:n])
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
+		fmt.Println("reading response from calc handler...")
 		buffer = make([]byte, 64)
-		n, err = pConn.Read(buffer)
+		n, err = destConn.Read(buffer)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
+		}
+		err = destConn.Close()
+		if err != nil {
+			log.Fatal(err)
 		}
 
-		respAddr, err := net.ResolveUDPAddr("udp", raddr.String())
-		if err != nil {
-			panic(err)
-		}
-
-		respConn, err := net.DialUDP("udp", addr, respAddr)
-		if err != nil {
-			panic(err)
-		}
-
-		respConn.Write(buffer[0:n])
+		fmt.Println("writing response from calc handler back to rmote device conn...")
+		c.Write(buffer[0:n])
 
 		buffer = make([]byte, 64)
 	}

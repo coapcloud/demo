@@ -16,7 +16,7 @@ func Run(port int) {
 	mux := coap.NewServeMux()
 	mux.Handle("*", dr)
 
-	fmt.Printf("serving CoAP requests on %d\n", port)
+	fmt.Printf("handling calculator requests on %d\n", port)
 	log.Fatal(coap.ListenAndServe("udp", fmt.Sprintf(":%d", port), mux))
 }
 

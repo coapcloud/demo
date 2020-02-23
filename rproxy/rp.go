@@ -52,7 +52,7 @@ func Start(port int) {
 		panic(err)
 	}
 
-	fmt.Printf("serving CoAP requests on %d\n", c.LocalAddr())
+	fmt.Printf("proxying CoAP requests on %s\n", c.LocalAddr())
 
 	buffer := make([]byte, 64)
 	for {

@@ -16,4 +16,4 @@ A POST with `-2` in the payload will subtract 2
 
 A GET will return the current calculator total
 
-A DELETE will clear the calculator
+A DELETE will clear the calculator back to 0 again

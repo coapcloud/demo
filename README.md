@@ -1,4 +1,4 @@
-# CoapCloud Demo
+# CoapCloud (UDP Proxy Version) Demo
 
 This is a simple demo of the basic UDP proxying to a separate coap-capable backend
 
